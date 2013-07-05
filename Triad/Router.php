@@ -140,11 +140,10 @@ class Router
 
             // this match always leads to MVP, no matter what
             if ($routeType == RouteType::MVP) {
-                // match [/presenter][-[id]][/action][/extended_path]
+                // match [/presenter][/action][/extended_path]
                 if (preg_match("#^/" .
                     "(?P<presenter>[^/]+)?" .
-                    "(-(?P<id>\\d+))" .
-                    "?/?(?P<action>[^/]+)?" .
+                    "/?(?P<action>[^/]+)?" .
                     "(?P<extended_path>(/([^/]+))*)" .
                     "$#", $path, $matches)) {
                     $params = $route;
@@ -153,6 +152,12 @@ class Router
                         // value exists
                         if (isset($matches[$param]) && strlen($matches[$param]) > 0)
                             $value = $matches[$param];
+                    }
+
+                    // check for presenter[-id]
+                    if (preg_match("#^(?<presenter>.*?)-(?<id>\\d+)$#", $params["presenter"], $matches)) {
+                        $params["presenter"] = $matches["presenter"];
+                        $params["id"] = $matches["id"];
                     }
 
                     return RouteType::MVP;
