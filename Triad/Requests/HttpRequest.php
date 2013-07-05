@@ -147,10 +147,10 @@ class HttpRequest extends Request
     /**
      * Creates a new request from server request
      * @param null $response Default response type, for example \Triad\Responses\JsonResponse
+     * @param array $settings array containing format_override and / or enable_json_callback properties
      * @return HttpRequest
-     * @throws \InvalidArgumentException
      */
-    public static function fromServerRequest($response = null) {
+    public static function fromServerRequest($response = null, $settings = array()) {
         $params = array();
         $path = "/";
 
@@ -165,8 +165,12 @@ class HttpRequest extends Request
             strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
             $params["response_format"] = Responses\JsonResponse::NAME;
 
+        $responseFormatOverride = false;
+        if (isset($settings["format_override"]) && $settings["format_override"])
+            $responseFormatOverride = true;
+
         // handle response type
-        if (isset($params["response_format"])) {
+        if (isset($params["response_format"]) && $responseFormatOverride) {
             switch($params["response_format"]) {
                 case Responses\JsonResponse::NAME:
                     $response = new Responses\JsonResponse();
@@ -185,7 +189,11 @@ class HttpRequest extends Request
             if (isset($params["pretty"]))
                 $request->getResponse()->setPretty($params["pretty"]);
 
-            if (isset($params["callback"]))
+            $enableJsonCallback = false;
+            if (isset($settings["enable_json_callback"]) && $settings["enable_json_callback"])
+                $enableJsonCallback = true;
+
+            if (isset($params["callback"]) && $enableJsonCallback)
                 $request->getResponse()->setCallback($params["callback"]);
         }
 
