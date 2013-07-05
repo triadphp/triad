@@ -119,7 +119,7 @@ class Request implements \Serializable
         RequestMethod::CREATE,
         RequestMethod::READ,
         RequestMethod::DELETE,
-        RequestMethod::DELETE
+        RequestMethod::UPDATE
     );
 
     public function setNestingLevel($nestingLevel) {
