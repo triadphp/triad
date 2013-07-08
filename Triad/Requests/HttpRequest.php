@@ -112,7 +112,7 @@ class HttpRequest extends Request
     }
 
     public final function setMethodHttp($httpMethod) {
-        switch (strtolower($httpMethod)) {
+        switch (strtoupper($httpMethod)) {
             case HttpRequestMethod::DELETE:
                 $this->setMethod(RequestMethod::DELETE);
                 break;
