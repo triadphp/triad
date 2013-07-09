@@ -86,6 +86,9 @@ $userData = \Triad\Request::factory("/users/get", array("id" => 1))
 # Application
 To create a new application, implement own Application class that extends `\Triad\Application` 
 ```php
+<?php
+require("Triad/Load.php");
+
 class Application extends \Triad\Application
 {
     public function init() {
