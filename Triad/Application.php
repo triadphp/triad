@@ -60,6 +60,9 @@ abstract class Application implements IApplication
     public final function __construct(Config $configuration) {
         $this->configuration = $configuration;
         $this->environment = ApplicationEnvironment::PRODUCTION;
+
+        if (isset($this->configuration["environment"]))
+            $this->setEnvironment($this->configuration["environment"]);
     }
 
     /**
@@ -137,13 +140,17 @@ abstract class Application implements IApplication
     public function execute(Request $request) {
         try {
             if (!$this->initialized) {
+                // check access
+                if (isset($this->configuration["client_secret"]))
+                    $request->validateRequest($this->configuration["client_secret"]);
+
+                // set base path
+                if (isset($this->configuration["base_path"]) && $request instanceof \Triad\Requests\HttpRequest)
+                    $request->setBasePath($this->configuration["base_path"]);
+
                 $this->init($this->configuration);
                 $this->initialized = true;
             }
-
-            // check access
-            if (isset($this->configuration["client_secret"]))
-                $request->validateRequest($this->configuration["client_secret"]);
 
             // check if maximum nested level is not reached
             $nestingLevel = $request->getNestingLevel();

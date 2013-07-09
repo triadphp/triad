@@ -118,16 +118,12 @@ class Application extends \Triad\Application
 }
 
 $config = \Triad\Config::factory(__DIR__ . "/config.php");
-
 $application = new Application($config);
-$application->setEnvironment($config["environment"]);
 
 // default response type
 $response = new \Triad\Responses\JsonResponse(); 
 
 $request = \Triad\Requests\HttpRequest::fromServerRequest($response);
-$request->setBasePath($config["base_path"]);
-
 $request->execute($application)->response->send();
 ```
 
