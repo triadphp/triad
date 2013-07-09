@@ -31,7 +31,12 @@ Request `\Triad\Request` consists of
 
 Request can be easily defined 
 ```php
-$request = \Triad\Request::factory("/users/get", array("params" => 1), $response);
+$request = new \Triad\Request("/users/get");
+$request->setParams(array("params" => 1));
+$request->setMethod(\Triad\RequestMethod::READ);
+```
+```php
+$request = \Triad\Request::factory("/users/get", array("params" => 1));
 ```
 
 or created from http request 
