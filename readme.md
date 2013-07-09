@@ -58,6 +58,8 @@ $response->outputBody(); // output
 var_dump($response->get()); // return
 ```
 
+<img src="//raw.github.com/triadphp/triad/master/docs/triad-scheme.png" />
+
 ### Summary
 Internal requests in same application are called as easy as 
 ```php
