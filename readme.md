@@ -109,7 +109,9 @@ class Application extends \Triad\Application
         $this->setRouter($router);
     }
 
-    public function myCustomHandler(Application $application, \Triad\Request $request, $params = array()) {
+    public function myCustomHandler(Application $application, 
+        \Triad\Request $request, 
+        $params = array()) {
         $request->response["number"] = $params["number_to_increment"] + 1;
     }
 
