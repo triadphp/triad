@@ -59,7 +59,7 @@ var_dump($response->get()); // return
 ```
 
 ### Summary
-Internal requests in same app as easy as 
+Internal requests in same application are called as easy as 
 ```php
 $created = \Triad\Request::factory("/users/create", array("email" => "john@doe.com"))
            ->execute($this->application)
@@ -67,7 +67,7 @@ $created = \Triad\Request::factory("/users/create", array("email" => "john@doe.c
            ->get();
 ```
 
-and to remote application (remote server) as  
+Requests to remote application running on remote http server are done using `\Triad\RemoteApplication` as  
 ```php
 $remoteServer = \Triad\RemoteApplication::factory(array(
    "url" => "http://server02",
