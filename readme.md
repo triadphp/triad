@@ -71,7 +71,8 @@ Requests to remote application running on remote http server are done using `\Tr
 ```php
 $remoteServer = \Triad\RemoteApplication::factory(array(
    "url" => "http://server02",
-   "base_path" => "/"
+   "base_path" => "/", 
+   "client_secret" => "" // if remote application client_secret set in config
 ));
 
 $userData = \Triad\Request::factory("/users/get", array("id" => 1))
@@ -81,6 +82,58 @@ $userData = \Triad\Request::factory("/users/get", array("id" => 1))
 ```
 
 # Create application
+To create a new application, implement own Application class that extends `\Triad\Application` 
+```php
+class Application extends \Triad\Application
+{
+    public function init() {
+        // initialize database or other services used in application
+        // $this->database = new \Triad\Database($this->configuration["database"]["dns"]);
+            
+        // set up routes
+        $router = new \Triad\Router();
+        
+        // simple route that matches /increment-[number] 
+        $router->add("#^/increment-(?P<number_to_increment>\d+)#", array($this, "myCustomHandler"), true); 
+        $this->setRouter($router);
+    }
+
+    public function myCustomHandler(Application $application, Request $request, $params = array()) {
+        $request->response["number"] = $params["number_to_increment"] + 1;
+    }
+    
+    /**
+     * Do something with exception occured during application execute
+     * @param \Exception $e
+     * @param \Triad\Request $request
+     */
+    public function handleException(\Exception $e, Request $request) {
+        return parent::handleException($e, $request);
+    }
+}
+
+$config = \Triad\Config::factory(__DIR__ . "/config.php");
+
+$application = new Application($config);
+$application->setEnvironment($config["environment"]);
+```
+
+`config.php` containing your app settings 
+```php
+<?php
+return array(
+    "base_path" => "/", 
+    "environment" => "development", 
+    "client_secret" => ""
+    
+    // define custom service settings  
+    "database" => array
+    (
+        "dns" => "mysql:host=127.0.0.1;dbname=database;charset=UTF8"
+    ),
+);
+```
+
 Check examples of full applications that follow MVP, PHP namespaces and dependency injection design patterns. 
 [Examples](https://github.com/triadphp/examples)
 
