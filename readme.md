@@ -134,6 +134,7 @@ return array(
 );
 ```
 
+### Full examples
 Check examples of full applications that follow MVP, PHP namespaces and dependency injection design patterns. 
 [Examples](https://github.com/triadphp/examples)
 
