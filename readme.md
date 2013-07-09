@@ -125,6 +125,8 @@ $config = \Triad\Config::factory(__DIR__ . "/config.php");
 
 $application = new Application($config);
 $application->setEnvironment($config["environment"]);
+
+\Triad\Requests\HttpRequest::fromServerRequest()->execute($application)->response->outputBody();
 ```
 
 `config.php` containing your app settings 
