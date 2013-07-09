@@ -17,22 +17,26 @@ to remote server.
 - PHP 5.3 or better (for namespace support)
 
 # Requests and responses
-Build in Response are 
+Responses is dictionary with values that contain own serializing methods. Build in responses are 
 - `\Triad\Responses\JsonResponse`
 - `\Triad\Responses\PhpSerializeResponse`
 - `\Triad\Responses\RawResponse`
 - `\Triad\Responses\RedirectResponse`
 
-Build in Request `\Triad\Request` consists of 
+Request `\Triad\Request` consists of 
 - `method` - `create`, `read`, `update`, `delete`
 - `path` (string with full path /site-path)
 - `params` (dictionary array with params)
 
-Request can be easily created from PHP http request or defined 
+Request can be easily defined or created from http request 
 ```php
 // this will be default response type, but methods inside application can override it
 $response = new \Triad\Responses\JsonResponse(); 
 
+// define
+$request = \Triad\Request::factory("/users/get", array("params" => 1), $response);
+
+// create from current http request
 $request = \Triad\Requests\HttpRequest::fromServerRequest($response, array(
     // allow changeing response type to php or json http://localhost/?response_format=php
     "format_override" => true, 
@@ -40,11 +44,9 @@ $request = \Triad\Requests\HttpRequest::fromServerRequest($response, array(
     // enables callback for jsonp requests http://localhost/?callback=myfunction
     "enable_json_callback" => true 
 ));
-
-$request = \Triad\Request::factory("/users/get", array("params" => 1));
 ```
 
-Request are called against `application` in order to execute application and get response
+Request are called against application in order to execute it and get response
 ```php
 $response = $request->execute($application)->response;
 ```
