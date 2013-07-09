@@ -16,8 +16,62 @@ to remote server.
 # Prerequisites
 - PHP 5.3 or better (for namespace support)
 
-# Requests -> Application -> Response
+# Requests and responses
+Build in Response are 
+- `\Triad\Responses\JsonResponse`
+- `\Triad\Responses\PhpSerializeResponse`
+- `\Triad\Responses\RawResponse`
+- `\Triad\Responses\RedirectResponse`
+to create response, just create these instance.
 
+Build in Request `\Triad\Request` consists of 
+- `method` - `create`, `read`, `update`, `delete`
+- `path` (string with full path /site-path)
+- `params` (dictionary array with params)
+
+Request can be easily created from PHP http request using 
+```php
+$response = new \Triad\Responses\JsonResponse(); // this will be default response type, but methods inside application can override it
+$request = \Triad\Requests\HttpRequest::fromServerRequest($response, array(
+    "format_override" => true, // allow changeing response type to php or json http://localhost/?response_format=php
+    "enable_json_callback" => true // enables callback for jsonp requests http://localhost/?callback=myfunction
+));
+```
+
+or internally as 
+```php
+$request = \Triad\Request::factory("/users/get", array("params" => 1))
+```
+
+Request are called against `application` in order to execute application and get response
+```php
+$response = $request->execute($application)->response;
+```
+
+And response can be outputed with output buffer (php print)
+```php
+$response->outputBody();
+```
+
+or they can be returned using get method
+```php
+var_dump($response->get());
+```
+
+this makes internal HMVP requests in same app as easy as 
+```php
+$created = \Triad\Request::factory("/users/create", array("email" => "john@doe.com"))->execute($this->application)->response->get();
+```
+and to remote application (remote server) as follow 
+```php
+$remoteServer = \Triad\RemoteApplication::factory(array(
+   "url" => "http://server02",
+   "base_path" => "/"
+));
+$userData = \Triad\Request::factory("/users/get", array("id" => 1))->execute($remoteServer)->response->get();
+```
+
+# Create application
 Check examples of full applications that follow MVP, PHP namespaces and dependency injection design patterns. 
 [Examples](https://github.com/triadphp/examples)
 
