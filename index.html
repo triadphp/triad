@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Triad : Triad - Lightweight MVP / HMVP Framework" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Triad</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/triadphp/triad">View on GitHub</a>
+
+          <h1 id="project_title">Triad</h1>
+          <h2 id="project_tagline">Triad - Lightweight MVP / HMVP Framework</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/triadphp/triad/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/triadphp/triad/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="triad-php-framework" class="anchor" href="#triad-php-framework"><span class="octicon octicon-link"></span></a>Triad PHP Framework</h1>
+
+<p>Triad PHP Framework is PHP 5.3 framework handling (HTTP or other) requests to your application that
+results in response - json, php serialized, raw, template engine - smarty or custom.</p>
+
+<p>This framework was done with simplicity in mind - basically it handles requests and handling exceptions. 
+Custom classes (database or template engine) can be easily implemented in application 
+and this framework is not trying to implement custom database or template engine class - 
+instead, use the one you like the most! </p>
+
+<p>Router can handle simple requests or MVP application at full - and you can easily create inline requests 
+in your application (this Framework is HMVP - check
+<a href="http://en.wikipedia.org/wiki/Hierarchical_model%E2%80%93view%E2%80%93controller">HMVC</a> as reference) - even
+to remote server. </p>
+
+<h1>
+<a name="prerequisites" class="anchor" href="#prerequisites"><span class="octicon octicon-link"></span></a>Prerequisites</h1>
+
+<ul>
+<li>PHP 5.3 or better (for namespace support)</li>
+</ul><h1>
+<a name="requests-and-responses" class="anchor" href="#requests-and-responses"><span class="octicon octicon-link"></span></a>Requests and responses</h1>
+
+<p><img src="https://raw.github.com/triadphp/triad/master/docs/triad-scheme.png"></p>
+
+<h3>
+<a name="request" class="anchor" href="#request"><span class="octicon octicon-link"></span></a>Request</h3>
+
+<p>Request <code>\Triad\Request</code> consists of </p>
+
+<ul>
+<li>
+<code>method</code> - <code>create</code>, <code>read</code>, <code>update</code>, <code>delete</code>
+</li>
+<li>
+<code>path</code> (string with full path /site-path)</li>
+<li>
+<code>params</code> (dictionary array with params)</li>
+</ul><p>Request can be defined </p>
+
+<div class="highlight"><pre><span class="nv">$request</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Triad\Request</span><span class="p">(</span><span class="s2">"/users/get"</span><span class="p">);</span>
+<span class="nv">$request</span><span class="o">-&gt;</span><span class="na">setParams</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s2">"params"</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">));</span>
+<span class="nv">$request</span><span class="o">-&gt;</span><span class="na">setMethod</span><span class="p">(</span><span class="nx">\Triad\RequestMethod</span><span class="o">::</span><span class="na">READ</span><span class="p">);</span>
+</pre></div>
+
+<div class="highlight"><pre><span class="nv">$request</span> <span class="o">=</span> <span class="nx">\Triad\Request</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s2">"/users/get"</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s2">"params"</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">));</span>
+</pre></div>
+
+<p>or created from http request </p>
+
+<div class="highlight"><pre><span class="nv">$request</span> <span class="o">=</span> <span class="nx">\Triad\Requests\HttpRequest</span><span class="o">::</span><span class="na">fromServerRequest</span><span class="p">();</span>
+</pre></div>
+
+<h3>
+<a name="response" class="anchor" href="#response"><span class="octicon octicon-link"></span></a>Response</h3>
+
+<p>Response is dictionary with values that contain own serializing method <code>outputBody</code> and return method <code>get</code>. 
+Build in responses are </p>
+
+<ul>
+<li><code>\Triad\Responses\JsonResponse</code></li>
+<li><code>\Triad\Responses\PhpSerializeResponse</code></li>
+<li><code>\Triad\Responses\RawResponse</code></li>
+<li><code>\Triad\Responses\RedirectResponse</code></li>
+</ul><p>To obtain final response after application execution</p>
+
+<div class="highlight"><pre><span class="nv">$response</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="nv">$application</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">response</span><span class="p">;</span>
+</pre></div>
+
+<p>Response can be outputed with output buffer (php print) or returned</p>
+
+<div class="highlight"><pre><span class="nv">$response</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">();</span> <span class="c1">// output</span>
+<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$response</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">());</span> <span class="c1">// return</span>
+</pre></div>
+
+<h3>
+<a name="summary" class="anchor" href="#summary"><span class="octicon octicon-link"></span></a>Summary</h3>
+
+<p>Internal calls in same application are called as easy as </p>
+
+<div class="highlight"><pre><span class="nv">$created</span> <span class="o">=</span> <span class="nx">\Triad\Request</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s2">"/users/create"</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s2">"email"</span> <span class="o">=&gt;</span> <span class="s2">"john@doe.com"</span><span class="p">))</span>
+           <span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">application</span><span class="p">)</span>
+           <span class="o">-&gt;</span><span class="na">response</span>
+           <span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span>
+</pre></div>
+
+<p>Calls to remote application running on remote http server are done using <code>\Triad\RemoteApplication</code> as  </p>
+
+<div class="highlight"><pre><span class="nv">$remoteServer</span> <span class="o">=</span> <span class="nx">\Triad\RemoteApplication</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s2">"url"</span> <span class="o">=&gt;</span> <span class="s2">"http://server02"</span><span class="p">,</span>
+   <span class="s2">"base_path"</span> <span class="o">=&gt;</span> <span class="s2">"/"</span><span class="p">,</span> 
+   <span class="s2">"client_secret"</span> <span class="o">=&gt;</span> <span class="s2">""</span> <span class="c1">// if remote application client_secret set in config</span>
+<span class="p">));</span>
+
+<span class="nv">$userData</span> <span class="o">=</span> <span class="nx">\Triad\Request</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s2">"/users/get"</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s2">"id"</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="nv">$remoteServer</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">response</span>
+            <span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span>
+</pre></div>
+
+<h1>
+<a name="application" class="anchor" href="#application"><span class="octicon octicon-link"></span></a>Application</h1>
+
+<p>To create a new application, implement own Application class that extends <code>\Triad\Application</code> </p>
+
+<p><code>index.php</code></p>
+
+<div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">require</span><span class="p">(</span><span class="s2">"Triad/Load.php"</span><span class="p">);</span>
+
+<span class="k">class</span> <span class="nc">Application</span> <span class="k">extends</span> <span class="nx">\Triad\Application</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">init</span><span class="p">()</span> <span class="p">{</span>
+        <span class="c1">// set up routes</span>
+        <span class="nv">$router</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Triad\Router</span><span class="p">();</span>
+
+        <span class="c1">// simple route that matches /increment-[number] </span>
+        <span class="nv">$router</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="s2">"#^/increment-(?P&lt;number_to_increment&gt;\d+)#"</span><span class="p">,</span> 
+            <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s2">"myCustomHandler"</span><span class="p">),</span> 
+            <span class="k">true</span> <span class="c1">// regex matching enabled</span>
+        <span class="p">);</span> 
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setRouter</span><span class="p">(</span><span class="nv">$router</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">myCustomHandler</span><span class="p">(</span><span class="nx">Application</span> <span class="nv">$application</span><span class="p">,</span> 
+        <span class="nx">\Triad\Request</span> <span class="nv">$request</span><span class="p">,</span> 
+        <span class="nv">$params</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span> <span class="p">{</span>
+        <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">response</span><span class="p">[</span><span class="s2">"number"</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$params</span><span class="p">[</span><span class="s2">"number_to_increment"</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">handleException</span><span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">,</span> <span class="nx">\Triad\Request</span> <span class="nv">$request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">var_dump</span><span class="p">(</span><span class="nv">$e</span><span class="p">);</span> 
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">$config</span> <span class="o">=</span> <span class="nx">\Triad\Config</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s2">"/config.php"</span><span class="p">);</span>
+<span class="nv">$application</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+
+<span class="c1">// default response type</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Triad\Responses\JsonResponse</span><span class="p">();</span> 
+
+<span class="nv">$request</span> <span class="o">=</span> <span class="nx">\Triad\Requests\HttpRequest</span><span class="o">::</span><span class="na">fromServerRequest</span><span class="p">(</span><span class="nv">$response</span><span class="p">);</span>
+<span class="nv">$request</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="nv">$application</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">response</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">();</span>
+</pre></div>
+
+<p><code>config.php</code> containing your app settings </p>
+
+<div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s2">"base_path"</span> <span class="o">=&gt;</span> <span class="s2">"/"</span><span class="p">,</span> 
+    <span class="s2">"environment"</span> <span class="o">=&gt;</span> <span class="s2">"development"</span><span class="p">,</span> 
+    <span class="s2">"client_secret"</span> <span class="o">=&gt;</span> <span class="k">null</span>
+<span class="p">);</span>
+</pre></div>
+
+<p><code>.htaccess</code> mod rewrite settings</p>
+
+<pre><code>&lt;IfModule mod_rewrite.c&gt;
+    RewriteEngine On
+    # RewriteBase /
+
+    # front controller
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule .* index.php [L]
+&lt;/IfModule&gt;
+</code></pre>
+
+<h3>
+<a name="full-examples" class="anchor" href="#full-examples"><span class="octicon octicon-link"></span></a>Full examples</h3>
+
+<p>Check examples of full applications that follow MVP, PHP namespaces and dependency injection design patterns. 
+<a href="https://github.com/triadphp/examples">Examples</a></p>
+
+<h2>
+<a name="author" class="anchor" href="#author"><span class="octicon octicon-link"></span></a>Author</h2>
+
+<ul>
+<li><a href="mailto:vavrecan@gmail.com">Marek Vavrecan</a></li>
+<li><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=DX479UBWGSMUG&amp;lc=US&amp;item_name=PHP%20Triad&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted">Donate by PayPal</a></li>
+</ul><h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<ul>
+<li><a href="http://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License, version 3</a></li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Triad maintained by <a href="https://github.com/triadphp">triadphp</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
