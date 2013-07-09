@@ -17,19 +17,16 @@ to remote server.
 - PHP 5.3 or better (for namespace support)
 
 # Requests and responses
-Response is dictionary with values that contain own serializing method `outputBody` and return method `get`. 
-Build in responses are 
-- `\Triad\Responses\JsonResponse`
-- `\Triad\Responses\PhpSerializeResponse`
-- `\Triad\Responses\RawResponse`
-- `\Triad\Responses\RedirectResponse`
 
+<img src="docs/triad-scheme.png" />
+
+### Request 
 Request `\Triad\Request` consists of 
 - `method` - `create`, `read`, `update`, `delete`
 - `path` (string with full path /site-path)
 - `params` (dictionary array with params)
 
-Request can be easily defined 
+Request can be defined 
 ```php
 $request = new \Triad\Request("/users/get");
 $request->setParams(array("params" => 1));
@@ -44,21 +41,27 @@ or created from http request
 $request = \Triad\Requests\HttpRequest::fromServerRequest();
 ```
 
-Request is then called against application in order to execute it and get response
+### Response 
+Response is dictionary with values that contain own serializing method `outputBody` and return method `get`. 
+Build in responses are 
+- `\Triad\Responses\JsonResponse`
+- `\Triad\Responses\PhpSerializeResponse`
+- `\Triad\Responses\RawResponse`
+- `\Triad\Responses\RedirectResponse`
+
+To obtain final response after application execution
 ```php
 $response = $request->execute($application)->response;
 ```
 
-And response can be outputed with output buffer (php print) or returned
+Response can be outputed with output buffer (php print) or returned
 ```php
 $response->send(); // output
 var_dump($response->get()); // return
 ```
 
-<img src="docs/triad-scheme.png" />
-
 ### Summary
-Internal requests in same application are called as easy as 
+Internal calls in same application are called as easy as 
 ```php
 $created = \Triad\Request::factory("/users/create", array("email" => "john@doe.com"))
            ->execute($this->application)
@@ -66,7 +69,7 @@ $created = \Triad\Request::factory("/users/create", array("email" => "john@doe.c
            ->get();
 ```
 
-Requests to remote application running on remote http server are done using `\Triad\RemoteApplication` as  
+Calls to remote application running on remote http server are done using `\Triad\RemoteApplication` as  
 ```php
 $remoteServer = \Triad\RemoteApplication::factory(array(
    "url" => "http://server02",
