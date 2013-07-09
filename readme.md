@@ -17,7 +17,8 @@ to remote server.
 - PHP 5.3 or better (for namespace support)
 
 # Requests and responses
-Responses is dictionary with values that contain own serializing methods. Build in responses are 
+Responses is dictionary with values that contain own serializing methods `outputBody` and `get`. 
+Build in responses are 
 - `\Triad\Responses\JsonResponse`
 - `\Triad\Responses\PhpSerializeResponse`
 - `\Triad\Responses\RawResponse`
@@ -46,7 +47,7 @@ $request = \Triad\Requests\HttpRequest::fromServerRequest($response, array(
 ));
 ```
 
-Request are called against application in order to execute it and get response
+Request is then called against application in order to execute it and get response
 ```php
 $response = $request->execute($application)->response;
 ```
