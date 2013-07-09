@@ -31,7 +31,7 @@ Request `\Triad\Request` consists of
 
 Request can be easily defined or created from http request 
 ```php
-// this will be default response type, but methods inside application can override it
+// this will be default response type - methods inside application can override it
 $response = new \Triad\Responses\JsonResponse(); 
 
 // define
