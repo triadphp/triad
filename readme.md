@@ -17,7 +17,7 @@ to remote server.
 - PHP 5.3 or better (for namespace support)
 
 # Requests and responses
-Responses is dictionary with values that contain own serializing methods `outputBody` and `get`. 
+Response is dictionary with values that contain own serializing method `outputBody` and return method `get`. 
 Build in responses are 
 - `\Triad\Responses\JsonResponse`
 - `\Triad\Responses\PhpSerializeResponse`
