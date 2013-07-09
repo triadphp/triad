@@ -29,22 +29,14 @@ Request `\Triad\Request` consists of
 - `path` (string with full path /site-path)
 - `params` (dictionary array with params)
 
-Request can be easily defined or created from http request 
+Request can be easily defined 
 ```php
-// this will be default response type - methods inside application can override it
-$response = new \Triad\Responses\JsonResponse(); 
-
-// define
 $request = \Triad\Request::factory("/users/get", array("params" => 1), $response);
+```
 
-// create from current http request
-$request = \Triad\Requests\HttpRequest::fromServerRequest($response, array(
-    // allow changeing response type to php or json http://localhost/?response_format=php
-    "format_override" => true, 
-    
-    // enables callback for jsonp requests http://localhost/?callback=myfunction
-    "enable_json_callback" => true 
-));
+or created from http request 
+```php
+$request = \Triad\Requests\HttpRequest::fromServerRequest();
 ```
 
 Request is then called against application in order to execute it and get response
@@ -122,7 +114,10 @@ $config = \Triad\Config::factory(__DIR__ . "/config.php");
 $application = new Application($config);
 $application->setEnvironment($config["environment"]);
 
-$request = \Triad\Requests\HttpRequest::fromServerRequest();
+// default response type
+$response = new \Triad\Responses\JsonResponse(); 
+
+$request = \Triad\Requests\HttpRequest::fromServerRequest($response);
 $request->setBasePath($config["base_path"]);
 
 $request->execute($application)->response->send();
