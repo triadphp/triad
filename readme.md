@@ -94,7 +94,11 @@ class Application extends \Triad\Application
         $router = new \Triad\Router();
         
         // simple route that matches /increment-[number] 
-        $router->add("#^/increment-(?P<number_to_increment>\d+)#", array($this, "myCustomHandler"), true); 
+        $router->add("#^/increment-(?P<number_to_increment>\d+)#", 
+            array($this, "myCustomHandler"), 
+            true // regex matching enabled
+        ); 
+        
         $this->setRouter($router);
     }
 
