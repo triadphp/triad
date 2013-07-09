@@ -51,6 +51,11 @@ class Request implements \Serializable
     public $response = null;
     protected $responseHandler = null;
 
+    /**
+     * @param string $path
+     * @param array $params
+     * @param \Triad\Response $response default response type - can be overriden during application execution
+     */
     public function __construct($path, $params = array(), $response = null) {
         $this->path = $path;
         $this->params = $params;
@@ -107,7 +112,7 @@ class Request implements \Serializable
     /**
      * @param string $path
      * @param array $params
-     * @param \Triad\Response $response
+     * @param \Triad\Response $response default response type
      * @return \Triad\Request
      */
     public static function factory($path, $params = array(), $response = null) {
