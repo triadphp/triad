@@ -58,6 +58,7 @@ $response->outputBody(); // output
 var_dump($response->get()); // return
 ```
 
+### Summary
 Internal requests in same app as easy as 
 ```php
 $created = \Triad\Request::factory("/users/create", array("email" => "john@doe.com"))
