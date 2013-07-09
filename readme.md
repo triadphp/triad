@@ -83,7 +83,7 @@ $userData = \Triad\Request::factory("/users/get", array("id" => 1))
             ->get();
 ```
 
-# Create application
+# Application
 To create a new application, implement own Application class that extends `\Triad\Application` 
 ```php
 class Application extends \Triad\Application
