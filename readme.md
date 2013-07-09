@@ -129,14 +129,14 @@ $application->setEnvironment($config["environment"]);
 $request = \Triad\Requests\HttpRequest::fromServerRequest();
 $request->setBasePath($config["base_path"]);
 
-\Triad\Requests\HttpRequest::fromServerRequest()->execute($application)->response->send();
+$request->execute($application)->response->send();
 ```
 
 `config.php` containing your app settings 
 ```php
 <?php
 return array(
-    "base_path" => "/simple/", 
+    "base_path" => "/", 
     "environment" => "development", 
     "client_secret" => null,
 
@@ -145,6 +145,19 @@ return array(
         "dns" => "mysql:host=127.0.0.1;dbname=database;charset=UTF8"
     )
 );
+```
+
+`.htaccess` mod rewrite settings
+```
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+	# RewriteBase /
+
+	# front controller
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule .* index.php [L]
+</IfModule>
 ```
 
 ### Full examples
