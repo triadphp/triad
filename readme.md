@@ -151,12 +151,12 @@ return array(
 ```
 <IfModule mod_rewrite.c>
     RewriteEngine On
-	# RewriteBase /
+    # RewriteBase /
 
-	# front controller
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_FILENAME} !-d
-	RewriteRule .* index.php [L]
+    # front controller
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule .* index.php [L]
 </IfModule>
 ```
 
