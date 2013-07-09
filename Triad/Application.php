@@ -140,13 +140,14 @@ abstract class Application implements IApplication
     public function execute(Request $request) {
         try {
             if (!$this->initialized) {
-                // check access
-                if (isset($this->configuration["client_secret"]))
-                    $request->validateRequest($this->configuration["client_secret"]);
 
                 // set base path
                 if (isset($this->configuration["base_path"]) && $request instanceof \Triad\Requests\HttpRequest)
                     $request->setBasePath($this->configuration["base_path"]);
+
+                // check access
+                if (isset($this->configuration["client_secret"]))
+                    $request->validateRequest($this->configuration["client_secret"]);
 
                 $this->init($this->configuration);
                 $this->initialized = true;
