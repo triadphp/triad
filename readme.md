@@ -54,7 +54,7 @@ $response = $request->execute($application)->response;
 
 And response can be outputed with output buffer (php print) or returned
 ```php
-$response->outputBody(); // output
+$response->send(); // output
 var_dump($response->get()); // return
 ```
 
@@ -107,16 +107,16 @@ class Application extends \Triad\Application
         $this->setRouter($router);
     }
 
-    public function myCustomHandler(Application $application, Request $request, $params = array()) {
+    public function myCustomHandler(Application $application, $request, $params = array()) {
         $request->response["number"] = $params["number_to_increment"] + 1;
     }
-    
+
     /**
      * Do something with exception occured during application execute
      * @param \Exception $e
      * @param \Triad\Request $request
      */
-    public function handleException(\Exception $e, Request $request) {
+    public function handleException(\Exception $e, \Triad\Request $request) {
         return parent::handleException($e, $request);
     }
 }
@@ -126,22 +126,24 @@ $config = \Triad\Config::factory(__DIR__ . "/config.php");
 $application = new Application($config);
 $application->setEnvironment($config["environment"]);
 
-\Triad\Requests\HttpRequest::fromServerRequest()->execute($application)->response->outputBody();
+$request = \Triad\Requests\HttpRequest::fromServerRequest();
+$request->setBasePath($config["base_path"]);
+
+\Triad\Requests\HttpRequest::fromServerRequest()->execute($application)->response->send();
 ```
 
 `config.php` containing your app settings 
 ```php
 <?php
 return array(
-    "base_path" => "/", 
+    "base_path" => "/simple/", 
     "environment" => "development", 
-    "client_secret" => ""
-    
+    "client_secret" => null,
+
     // define custom service settings  
-    "database" => array
-    (
+    "database" => array(
         "dns" => "mysql:host=127.0.0.1;dbname=database;charset=UTF8"
-    ),
+    )
 );
 ```
 
