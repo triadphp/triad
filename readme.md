@@ -22,7 +22,6 @@ Build in Response are
 - `\Triad\Responses\PhpSerializeResponse`
 - `\Triad\Responses\RawResponse`
 - `\Triad\Responses\RedirectResponse`
-to create response, just create these instance.
 
 Build in Request `\Triad\Request` consists of 
 - `method` - `create`, `read`, `update`, `delete`
