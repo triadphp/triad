@@ -94,9 +94,6 @@ require("Triad/Load.php");
 class Application extends \Triad\Application
 {
     public function init() {
-        // initialize database or other services used in application
-        // $this->database = new \Triad\Database($this->configuration["database"]["dns"]);
-            
         // set up routes
         $router = new \Triad\Router();
         
@@ -115,13 +112,8 @@ class Application extends \Triad\Application
         $request->response["number"] = $params["number_to_increment"] + 1;
     }
 
-    /**
-     * Do something with exception occured during application execute
-     * @param \Exception $e
-     * @param \Triad\Request $request
-     */
     public function handleException(\Exception $e, \Triad\Request $request) {
-        return parent::handleException($e, $request);
+    	var_dump($e); 
     }
 }
 
@@ -142,12 +134,7 @@ $request->execute($application)->response->send();
 return array(
     "base_path" => "/", 
     "environment" => "development", 
-    "client_secret" => null,
-
-    // define custom service settings  
-    "database" => array(
-        "dns" => "mysql:host=127.0.0.1;dbname=database;charset=UTF8"
-    )
+    "client_secret" => null
 );
 ```
 
