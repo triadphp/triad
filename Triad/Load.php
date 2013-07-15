@@ -38,6 +38,8 @@ require(TRIAD_DIR . "/Model.php");
 require(TRIAD_DIR . "/Requests/HttpRequest.php");
 
 require(TRIAD_DIR . "/Responses/HttpResponse.php");
+
+require(TRIAD_DIR . "/Responses/HtmlResponse.php");
 require(TRIAD_DIR . "/Responses/JsonResponse.php");
 require(TRIAD_DIR . "/Responses/PhpSerializeResponse.php");
 require(TRIAD_DIR . "/Responses/RedirectResponse.php");

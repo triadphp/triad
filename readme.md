@@ -44,6 +44,7 @@ $request = \Triad\Requests\HttpRequest::fromServerRequest();
 ### Response 
 Response is dictionary with values that contain own serializing method `outputBody` and return method `get`. 
 Build in responses are 
+- `\Triad\Responses\HtmlResponse`
 - `\Triad\Responses\JsonResponse`
 - `\Triad\Responses\PhpSerializeResponse`
 - `\Triad\Responses\RawResponse`
