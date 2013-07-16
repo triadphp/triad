@@ -211,6 +211,7 @@ class Request implements \Serializable
      */
     public final function execute(IApplication $application) {
         $application->execute($this);
+        $this->response->setExceptionHandler(array($application, "handleResponseException"));
         return $this;
     }
 

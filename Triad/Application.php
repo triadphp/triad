@@ -26,6 +26,7 @@ interface IApplication
 {
     public function execute(Request $request);
     public function handleException(\Exception $e, Request $request);
+    public function handleResponseException(\Exception $e, \Triad\Response $response);
 }
 
 /**
@@ -182,6 +183,45 @@ abstract class Application implements IApplication
     }
 
     /**
+     * Returns error data as array
+     * @param \Exception $e
+     * @param \Triad\Request|null $request
+     * @return array
+     */
+    private function formatError(\Exception $e, $request = null) {
+        // get some useful debugging info
+        $debugInfo = array();
+        if ($this->environment == ApplicationEnvironment::DEVELOPMENT) {
+            $debugInfo = array("debug" => array(
+                "file" => $e->getFile(),
+                "line" => $e->getLine(),
+                "code" => $e->getCode(),
+                "trace" => array_map(function($item) {
+                    // remove arguments from trace (they are causing recursion errors)
+                    if (isset($item["args"]))
+                        unset($item["args"]);
+                    return $item;
+                }, $e->getTrace()),
+                "request" => ($request != null ? array(
+                    "method" => $request->getMethod(),
+                    "path" => $request->getPath(),
+                    "params" => $request->getParams(),
+                ) : array()),
+            ));
+        }
+
+        // exception class name
+        $class = get_class($e);
+        $class = Utils::extractClassName($class);
+
+        // return error data
+        return array(
+            "message" => $e->getMessage(),
+            "type" => $class
+        ) + $debugInfo;
+    }
+
+    /**
      * Get frienty exception details into request response
      * @param \Exception $e
      * @param Request $request
@@ -204,35 +244,30 @@ abstract class Application implements IApplication
             $response->setResponseCode($httpErrorCode);
         }
 
-        // get some useful debugging info
-        $debugInfo = array();
-        if ($this->environment == ApplicationEnvironment::DEVELOPMENT) {
-            $debugInfo = array("debug" => array(
-                "file" => $e->getFile(),
-                "line" => $e->getLine(),
-                "code" => $e->getCode(),
-                "trace" => array_map(function($item) {
-                    // remove arguments from trace (they are causing recursion errors)
-                    if (isset($item["args"]))
-                        unset($item["args"]);
-                    return $item;
-                }, $e->getTrace()),
-                "request" => array(
-                    "method" => $request->getMethod(),
-                    "path" => $request->getPath(),
-                    "params" => $request->getParams(),
-                ),
-            ));
-        }
-
-        // exception class name
-        $class = get_class($e);
-        $class = Utils::extractClassName($class);
-
         // print user friendly error
-        $response["error"] = array(
-            "message" => $e->getMessage(),
-            "type" => $class
-        ) + $debugInfo;
+        $response["error"] = $this->formatError($e, $request);
+    }
+
+    /**
+     * Handle Exception occured during processing response
+     * @param \Exception $e
+     * @param Response $response
+     */
+    public function handleResponseException(\Exception $e, \Triad\Response $response) {
+        $response->clear();
+
+        if ($response instanceof \Triad\Responses\HttpResponse) {
+            // make sure we output http error code so this will not get indexed
+            $httpErrorCode = \Triad\Requests\HttpStatusCode::INTERNAL_SERVER_ERROR;
+            $response->setResponseCode($httpErrorCode);
+            $response->outputHeaders();
+
+            // display mini error information
+            print "<pre>";
+            print str_repeat("-", 80) . "<br />";
+            print "<strong>Error during processing response</strong><br />";
+            print_r($this->formatError($e));
+            print "</pre>";
+        }
     }
 }

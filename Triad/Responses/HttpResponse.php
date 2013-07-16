@@ -44,10 +44,16 @@ class HttpResponse extends Response {
         }
     }
 
-    public function send() {
-        $this->before();
-        $this->outputHeaders();
-        $this->outputBody();
-        $this->after();
+    public function before() {
+        try {
+            $this->before();
+            $this->outputHeaders();
+            $this->outputBody();
+            $this->after();
+        }
+        catch (\Exception $e) {
+            if (is_callable($this->exceptionHandler))
+                call_user_func_array($this->exceptionHandler, array($e, $this));
+        }
     }
 }

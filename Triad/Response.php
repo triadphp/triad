@@ -18,8 +18,13 @@ namespace Triad;
  */
 class Response implements \ArrayAccess {
     protected $container = array();
+    protected $exceptionHandler = null;
 
     public function __construct() {
+    }
+
+    public function setExceptionHandler($callback) {
+        $this->exceptionHandler = $callback;
     }
 
     protected function outputBody() {
@@ -35,9 +40,15 @@ class Response implements \ArrayAccess {
     }
 
     public function send() {
-        $this->before();
-        $this->outputBody();
-        $this->after();
+        try {
+            $this->before();
+            $this->outputBody();
+            $this->after();
+        }
+        catch (\Exception $e) {
+            if (is_callable($this->exceptionHandler))
+                call_user_func_array($this->exceptionHandler, array($e, $this));
+        }
     }
 
     public function clear() {

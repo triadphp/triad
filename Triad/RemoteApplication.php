@@ -181,4 +181,8 @@ class RemoteApplication implements IApplication
             "type" => $class
         );
     }
+
+    public function handleResponseException(\Exception $e, \Triad\Response $response) {
+        // not really important for remote calls
+    }
 }
