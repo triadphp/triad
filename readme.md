@@ -107,10 +107,6 @@ class Application extends \Triad\Application
         $params = array()) {
         $request->response["number"] = $params["number_to_increment"] + 1;
     }
-
-    public function handleException(\Exception $e, \Triad\Request $request) {
-    	var_dump($e); 
-    }
 }
 
 $config = \Triad\Config::factory(array("environment" => "development"));
