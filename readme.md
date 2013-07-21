@@ -95,16 +95,11 @@ require("Triad/Load.php");
 class Application extends \Triad\Application
 {
     public function init() {
-        // set up routes
-        $router = new \Triad\Router();
-        
         // simple route that matches /increment-[number] 
-        $router->add("#^/increment-(?P<number_to_increment>\d+)#", 
+        $this->router->add("#^/increment-(?P<number_to_increment>\d+)#", 
             array($this, "myCustomHandler"), 
             true // regex matching enabled
-        ); 
-        
-        $this->setRouter($router);
+        );
     }
 
     public function myCustomHandler(Application $application, 

@@ -54,7 +54,7 @@ abstract class Application implements IApplication
     /**
      * @var Router
      */
-    protected $route;
+    protected $router;
 
     private $initialized = false;
 
@@ -87,11 +87,11 @@ abstract class Application implements IApplication
     }
 
     public function setRouter(Router $route) {
-        $this->route = $route;
+        $this->router = $route;
     }
 
-    public function getRoute() {
-        return $this->route;
+    public function getRouter() {
+        return $this->router;
     }
 
     /**
@@ -150,6 +150,9 @@ abstract class Application implements IApplication
                 if (isset($this->configuration["client_secret"]))
                     $request->validateRequest($this->configuration["client_secret"]);
 
+                // initialize router
+                $this->router = new \Triad\Router();
+
                 $this->init($this->configuration);
                 $this->initialized = true;
             }
@@ -159,11 +162,11 @@ abstract class Application implements IApplication
             if ($nestingLevel > self::MAX_NESTING_LEVEL)
                 throw new \Triad\Exceptions\TriadException("Maximum request nesting level reached");
 
-            if (!($this->route instanceof \Triad\Router))
+            if (!($this->router instanceof \Triad\Router))
                 throw new \Triad\Exceptions\TriadException("Route is missing");
 
             $routeParams = array();
-            $routeMatch = $this->route->match($request, $routeParams);
+            $routeMatch = $this->router->match($request, $routeParams);
 
             switch ($routeMatch) {
                 case RouteType::MVP:
