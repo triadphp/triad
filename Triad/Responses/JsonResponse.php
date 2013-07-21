@@ -38,8 +38,10 @@ class JsonResponse extends HttpResponse {
     }
 
     public function before() {
-        // allow all origins for json handling
-        $this->addHeader("Access-Control-Allow-Origin: *");
+        // allow all origins for json handling only if callback is specified
+        if (!is_null($this->callback))
+            $this->addHeader("Access-Control-Allow-Origin: *");
+
         $this->addHeader("Content-type: text/javascript; charset=UTF-8");
     }
 
