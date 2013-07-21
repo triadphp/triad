@@ -113,7 +113,7 @@ class Application extends \Triad\Application
     }
 }
 
-$config = \Triad\Config::factory(__DIR__ . "/config.php");
+$config = \Triad\Config::factory(array("environment" => "development"));
 $application = new Application($config);
 
 // default response type
@@ -121,16 +121,6 @@ $response = new \Triad\Responses\JsonResponse();
 
 $request = \Triad\Requests\HttpRequest::fromServerRequest($response);
 $request->execute($application)->response->send();
-```
-
-`config.php` containing your app settings 
-```php
-<?php
-return array(
-    "base_path" => "/", 
-    "environment" => "development", 
-    "client_secret" => null
-);
 ```
 
 `.htaccess` mod rewrite settings

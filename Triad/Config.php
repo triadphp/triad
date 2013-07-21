@@ -21,14 +21,24 @@ class Config implements \ArrayAccess
 {
     protected $container = array();
 
-    public function load($config_file) {
-        $config_data = include($config_file);
-        $this->container = array_merge($this->container, $config_data);
+    public function loadFile($configFile) {
+        $configData = include($configFile);
+        $this->load($configData);
     }
 
-    public static function factory($config_file) {
+    public function load($configArray) {
+        $this->container = array_merge($this->container, $configArray);
+    }
+
+    public static function factory($configData) {
         $config = new Config();
-        $config->load($config_file);
+
+        // either open from array or from file
+        if (is_array($configData))
+            $config->load($configData);
+        else
+            $config->loadFile($configData);
+
         return $config;
     }
 
