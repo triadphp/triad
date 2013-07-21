@@ -168,18 +168,8 @@ class RemoteApplication implements IApplication
         }
     }
 
-    public function handleException(\Exception $e, Request $request)
-    {
-        $response = $request->getResponse();
-
-        $class = get_class($e);
-        $class = Utils::extractClassName($class);
-
-        // print user friendly error
-        $response["error"] = array(
-            "message" => $e->getMessage(),
-            "type" => $class
-        );
+    public function handleException(\Exception $e, Request $request) {
+        throw new \Triad\TriadException("Remote Application Exception handler should not be executed directly");
     }
 
     public function handleResponseException(\Exception $e, \Triad\Response $response) {
