@@ -44,7 +44,7 @@ class HttpResponse extends Response {
         }
     }
 
-    public function before() {
+    public function send() {
         try {
             $this->before();
             $this->outputHeaders();
