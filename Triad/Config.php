@@ -64,7 +64,7 @@ class Config implements \ArrayAccess
         return isset($this->container[$offset]);
     }
 
-    public function &offsetGet($offset) {
+    public function offsetGet($offset) {
         return $this->container[$offset];
     }
 
