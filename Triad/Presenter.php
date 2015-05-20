@@ -97,7 +97,7 @@ abstract class Presenter
      * Handle presenter action, run before and after methods
      * @throws Exceptions\NotFoundException Thrown if there is missing action handler in presenter
      */
-    public final function execute() {
+    public function execute() {
         // determine action function
         $action = 'action' . $this->actionName;
 
