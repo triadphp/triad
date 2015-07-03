@@ -187,4 +187,20 @@ class DatabaseDebug extends Database
 
         return $result;
     }
+    
+    public function beginTransaction() {
+        $this->db->beginTransaction();
+    }
+
+    public function rollBack() {
+        $this->db->rollBack();
+    }
+
+    public function commit() {
+        $this->db->commit();
+    }
+
+    public function inTransaction() {
+        return $this->db->inTransaction();
+    }
 }
