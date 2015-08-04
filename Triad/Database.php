@@ -121,16 +121,16 @@ class Database
     }
     
     public function update($table, $id, $saveData) {
-        $updateQuery = "UPDATE {$table} SET ";
+        $updateQuery = "UPDATE ".$this->escapeIdent($table)." SET ";
 
         $first = true;
         foreach ($saveData as $key => $value) {
-            $updateQuery .= ($first ? "" : ",") . " {$key} = :{$key}";
+            $updateQuery .= ($first ? "" : ",") . " ".$this->escapeIdent($key)." = :".$this->escapeIdent($key)."";
             $first = false;
         }
 
         if (is_array($id)) {
-            $key = key($id);
+            $key = $this->escapeIdent(key($id));
             $value = current($id);
 
             $saveData[$key] = $value;
@@ -144,11 +144,38 @@ class Database
         $this->exec($updateQuery, $saveData);
     }
 
+    public function delete($table, $id) {
+        $updateQuery = "DELETE FROM " . $this->escapeIdent($table);
+        $params = [];
+
+        if (is_array($id)) {
+            $key = $this->escapeIdent(key($id));
+            $value = current($id);
+
+            $params[$key] = $value;
+            $updateQuery .= " WHERE $key = :$key";
+        }
+        else {
+            $params["id"] = $id;
+            $updateQuery .= " WHERE id = :id";
+        }
+
+        $this->exec($updateQuery, $params);
+    }
+
     public function insert($table, $saveData) {
-        $keys = join(",", array_keys($saveData));
-        $values = ":".join(", :", array_keys($saveData));
-        $insertQuery = "INSERT INTO {$table}(" . $keys . ") VALUES(" . $values . ")";
+        $keys = join(",", $this->escapeIdent(array_keys($saveData)));
+        $values = ":".join(", :", $this->escapeIdent(array_keys($saveData)));
+        $insertQuery = "INSERT INTO " . $this->escapeIdent($table) . "(" . $keys . ") VALUES(" . $values . ")";
         $this->exec($insertQuery, $saveData);
+    }
+
+    private function escapeIdent($column) {
+        if (is_array($column))
+            return array_map([$this, "escapeIdent"], $column);
+
+        $column = preg_replace('/[^A-Za-z0-9_-]+/', '', $column);
+        return $column;
     }
 }
 
