@@ -118,6 +118,37 @@ class Database
 
         return $statement->fetchAll(PDO::FETCH_CLASS, $class);
     }
+    
+    public function update($table, $id, $saveData) {
+        $updateQuery = "UPDATE {$table} SET ";
+
+        $first = true;
+        foreach ($saveData as $key => $value) {
+            $updateQuery .= ($first ? "" : ",") . " {$key} = :{$key}";
+            $first = false;
+        }
+
+        if (is_array($id)) {
+            $key = key($id);
+            $value = current($id);
+
+            $saveData[$key] = $value;
+            $updateQuery .= " WHERE $key = :$key";
+        }
+        else {
+            $saveData["id"] = $id;
+            $updateQuery .= " WHERE id = :id";
+        }
+
+        $this->exec($updateQuery, $saveData);
+    }
+
+    public function insert($table, $saveData) {
+        $keys = join(",", array_keys($saveData));
+        $values = ":".join(", :", array_keys($saveData));
+        $insertQuery = "INSERT INTO {$table}(" . $keys . ") VALUES(" . $values . ")";
+        $this->exec($insertQuery, $saveData);
+    }
 }
 
 class DatabaseDebug extends Database
