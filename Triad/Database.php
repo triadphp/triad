@@ -34,7 +34,8 @@ class Database
         if (is_null($this->db)) {
             $this->db = new PDO($this->dns, $this->user, $this->password,
                 array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'', PDO::ATTR_PERSISTENT => true));
-
+            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            
             //  paranoid, huh, we will not need these anymore
             unset($this->user);
             unset($this->password);
