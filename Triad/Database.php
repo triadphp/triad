@@ -23,19 +23,20 @@ class Database
     protected $dns;
     protected $user;
     protected $password;
+    protected $persistent;
 
-    public function __construct($dns, $user, $password) {
+    public function __construct($dns, $user, $password, $persistent = false) {
         $this->dns = $dns;
         $this->user = $user;
         $this->password = $password;
+        $this->persistent = $persistent;
     }
 
     public function connect() {
         if (is_null($this->db)) {
-            $this->db = new PDO($this->dns, $this->user, $this->password,
-                array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'', PDO::ATTR_PERSISTENT => true));
+            $this->db = new PDO($this->dns, $this->user, $this->password, array(PDO::ATTR_PERSISTENT => $this->persistent));
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
+
             //  paranoid, huh, we will not need these anymore
             unset($this->user);
             unset($this->password);
@@ -119,7 +120,23 @@ class Database
 
         return $statement->fetchAll(PDO::FETCH_CLASS, $class);
     }
-    
+
+    public function beginTransaction() {
+        $this->db->beginTransaction();
+    }
+
+    public function rollBack() {
+        $this->db->rollBack();
+    }
+
+    public function commit() {
+        $this->db->commit();
+    }
+
+    public function inTransaction() {
+        return $this->db->inTransaction();
+    }
+
     public function update($table, $id, $saveData) {
         $updateQuery = "UPDATE ".$this->escapeIdent($table)." SET ";
 
@@ -170,7 +187,7 @@ class Database
         $this->exec($insertQuery, $saveData);
     }
 
-    private function escapeIdent($column) {
+    public function escapeIdent($column) {
         if (is_array($column))
             return array_map([$this, "escapeIdent"], $column);
 
@@ -245,21 +262,5 @@ class DatabaseDebug extends Database
         $this->tearDownLog($instance);
 
         return $result;
-    }
-    
-    public function beginTransaction() {
-        $this->db->beginTransaction();
-    }
-
-    public function rollBack() {
-        $this->db->rollBack();
-    }
-
-    public function commit() {
-        $this->db->commit();
-    }
-
-    public function inTransaction() {
-        return $this->db->inTransaction();
     }
 }

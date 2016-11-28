@@ -1,6 +1,6 @@
 # Triad PHP Framework
 
-Triad PHP Framework is PHP 5.3 framework handling (HTTP or other) requests to your application that
+Triad PHP Framework is PHP framework handling (HTTP or other) requests to your application that
 results in response - json, php serialized, raw, template engine - smarty or custom.
 
 This framework was done with simplicity in mind - basically it handles requests and handling exceptions. 
