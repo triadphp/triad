@@ -44,6 +44,7 @@ require(TRIAD_DIR . "/Responses/JsonResponse.php");
 require(TRIAD_DIR . "/Responses/PhpSerializeResponse.php");
 require(TRIAD_DIR . "/Responses/RedirectResponse.php");
 require(TRIAD_DIR . "/Responses/RawResponse.php");
+require(TRIAD_DIR . "/Responses/NullResponse.php");
 
 require(TRIAD_DIR . "/Exceptions/DatabaseException.php");
 require(TRIAD_DIR . "/Exceptions/RemoteException.php");
