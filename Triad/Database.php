@@ -121,6 +121,19 @@ class Database
         return $statement->fetchAll(PDO::FETCH_CLASS, $class);
     }
 
+    public function callbackFetchAll($callback, $sql, $params = null) {
+        $statement = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+
+        if (!$statement->execute($params)) {
+            throw new DatabaseException($statement->errorInfo());
+        }
+
+        // This will give better memory usage on big data result
+        while ($data = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $callback($data);
+        }
+    }
+
     public function beginTransaction() {
         $this->db->beginTransaction();
     }
