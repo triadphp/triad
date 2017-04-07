@@ -33,11 +33,11 @@ class HttpResponse extends Response {
     }
 
     public final function outputHeaders() {
-        if ($this->responseCode != null) {
-            header("HTTP/1.1 " . $this->responseCode, true, $this->responseCode);
-        }
-
         if (!headers_sent()) {
+            if ($this->responseCode != null) {
+                header("HTTP/1.1 " . $this->responseCode, true, $this->responseCode);
+            }
+
             foreach ($this->headers as $header) {
                 header($header);
             }
