@@ -207,6 +207,50 @@ class Database
         $column = preg_replace('/[^A-Za-z0-9_-]+/', '', $column);
         return $column;
     }
+
+    public function getTablesStructure() {
+        $database = $this->fetchColumn('SELECT DATABASE()');
+
+        $columns = $this->fetchAll("SELECT
+            table_name, column_name, is_nullable, character_set_name, collation_name, column_type, column_key, extra
+        FROM information_schema.columns
+            WHERE table_schema = :database ORDER BY table_name, ordinal_position", ["database" => $database]);
+
+        $indexes = $this->fetchAll("SELECT
+            table_name, index_name, column_name, non_unique
+        FROM information_schema.statistics
+            WHERE table_schema = :database ORDER BY table_name", ["database" => $database]);
+
+        $schemas = $this->fetchAll("SELECT
+            table_name, engine, table_collation
+        FROM information_schema.tables
+            WHERE table_schema = :database ORDER BY table_name", ["database" => $database]);
+
+        $tables = [];
+        foreach ($columns as $column) {
+            $data = [
+                "name" => $column["column_name"],
+                "nullable" => $column["is_nullable"] == "YES",
+                "character_set" => $column["character_set_name"],
+                "collation" => $column["collation_name"],
+                "type" => $column["column_type"],
+                "extra" => $column["extra"],
+            ];
+            $tables[$column["table_name"]]["columns"][] = $data;
+        }
+
+        foreach ($indexes as $index) {
+            $tables[$index["table_name"]]["indexes"][$index["index_name"]]["unique"] = !$index["non_unique"];
+            $tables[$index["table_name"]]["indexes"][$index["index_name"]]["columns"][] = $index["column_name"];
+        }
+
+        foreach ($schemas as $schema) {
+            $tables[$schema["table_name"]]["engine"] = $schema["engine"];
+            $tables[$schema["table_name"]]["table_collation"] = $schema["table_collation"];
+        }
+
+        return $tables;
+    }
 }
 
 class DatabaseDebug extends Database
