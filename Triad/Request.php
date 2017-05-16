@@ -54,7 +54,7 @@ class Request implements \Serializable
     /**
      * @param string $path
      * @param array $params
-     * @param \Triad\Response $response default response type - can be overriden during application execution
+     * @param \Triad\Response $response default response type - can be overridden during application execution
      */
     public function __construct($path, $params = array(), $response = null) {
         $this->path = $path;

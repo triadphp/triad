@@ -10,18 +10,28 @@
 
 namespace Triad;
 
-/**
- * This session is dummy
- * It just handles cookies
- */
 class Session implements \ArrayAccess
 {
-    private $expiration;
+    private $duration;
     private $prefix;
 
+    private $secureOnly = false;
+    private $domain = "";
+    private $path = "/";
+
     public function __construct() {
-        $this->expiration = 60*60*24; // 24 hours
+        $this->duration = 60*60; // 1 hours
         $this->prefix = "";
+    }
+
+    public function setSecurity($domain, $path, $secureOnly) {
+        $this->domain = $domain;
+        $this->path = $path;
+        $this->secureOnly = $secureOnly;
+    }
+
+    public function setDuration($duration) {
+        $this->duration = $duration;
     }
 
     public function offsetExists($offset)
@@ -36,13 +46,35 @@ class Session implements \ArrayAccess
 
     public function offsetSet($offset, $value)
     {
-        setcookie($this->prefix . $offset, $value, time() + $this->expiration, "/", null, false, true);
+        $this->setSecureCookie($this->prefix . $offset, $value, $this->duration);
         $_COOKIE[$this->prefix . $offset] = $value;
     }
 
     public function offsetUnset($offset)
     {
-        setcookie($this->prefix . $offset, null, 1, "/", null, false, true);
+        $this->setSecureCookie($this->prefix . $offset, "", -$this->duration);
         unset($_COOKIE[$this->prefix . $offset]);
+    }
+
+    protected function setSecureCookie($cookie, $value, $duration) {
+        // build cookie manually to support SameSite policy
+        $expires = \gmdate('D, d-M-Y H:i:s T', time() + $duration);
+        $cookieString = "{$cookie}=" . urlencode($value) . "; expires={$expires}; Max-age=" . (int)$duration . "; path={$this->path}";
+
+        if (!empty($this->domain))
+            $cookieString .= "; domain={$this->domain}";
+
+        if ($this->secureOnly)
+            $cookieString .= "; secure";
+
+        $cookieString .= "; HttpOnly";
+
+        if ($this->secureOnly)
+            $cookieString .= "; SameSite=Strict";
+
+        if (!headers_sent())
+            header("Set-Cookie: {$cookieString}");
+
+        // setcookie($cookie, $value, time() + $duration, $this->path, $this->domain, $this->secureOnly, true);
     }
 }
