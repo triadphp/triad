@@ -46,8 +46,8 @@ class Session implements \ArrayAccess
 
     public function offsetSet($offset, $value)
     {
-        $this->setSecureCookie($this->prefix . $offset, $value, $this->duration);
         $_COOKIE[$this->prefix . $offset] = $value;
+        $this->setSecureCookie($this->prefix . $offset, $value, $this->duration);
     }
 
     public function offsetUnset($offset)
