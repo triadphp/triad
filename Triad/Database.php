@@ -193,10 +193,11 @@ class Database
         $this->exec($updateQuery, $params);
     }
 
-    public function insert($table, $saveData) {
+    public function insert($table, $saveData, $ignore = false) {
         $keys = join(",", $this->escapeIdent(array_keys($saveData)));
         $values = ":".join(", :", $this->escapeIdent(array_keys($saveData)));
-        $insertQuery = "INSERT INTO " . $this->escapeIdent($table) . "(" . $keys . ") VALUES(" . $values . ")";
+        $insertAction = $ignore ? "INSERT IGNORE INTO" : "INSERT INTO";
+        $insertQuery = $insertAction . " " . $this->escapeIdent($table) . "(" . $keys . ") VALUES(" . $values . ")";
         $this->exec($insertQuery, $saveData);
     }
 
