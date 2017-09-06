@@ -220,6 +220,14 @@ class HttpRequest extends Request
             unset($request->params["method"]);
         }
 
+        // read json as request
+        if (isset($_SERVER["CONTENT_TYPE"]) && preg_match("#^application\\/json#", $_SERVER["CONTENT_TYPE"])) {
+            $getParams = $request->params;
+            $params = (array)json_decode(file_get_contents("php://input"), true);
+            $request->params = $params;
+            $request->params += $getParams;
+        }
+
         // update arguments by post params (priority over get)
         if (isset($_POST) && is_array($_POST) && count($_POST) > 0) {
             $getParams = $request->params;
