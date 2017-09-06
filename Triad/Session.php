@@ -61,8 +61,11 @@ class Session implements \ArrayAccess
         $expires = \gmdate('D, d-M-Y H:i:s T', time() + $duration);
         $cookieString = "{$cookie}=" . urlencode($value) . "; expires={$expires}; Max-age=" . (int)$duration . "; path={$this->path}";
 
-        if (!empty($this->domain))
-            $cookieString .= "; domain={$this->domain}";
+        if (!empty($this->domain)) {
+            // remove port
+            $domain = preg_replace("/(?P<port>:\d+)$/", "", $this->domain);
+            $cookieString .= "; domain={$domain}";
+        }
 
         if ($this->secureOnly)
             $cookieString .= "; secure";
