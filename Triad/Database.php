@@ -81,6 +81,13 @@ class Database
         return $statement->fetchObject($class);
     }
 
+    /**
+     * @deprecated use fetchColumn
+     */
+    public function fetchSingle($sql, $params = null) {
+        return $this->fetchColumn($sql, $params);
+    }
+
     public function fetchColumn($sql, $params = null) {
         $statement = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 
@@ -159,37 +166,13 @@ class Database
             $first = false;
         }
 
-        if (is_array($id)) {
-            $key = $this->escapeIdent(key($id));
-            $value = current($id);
-
-            $saveData[$key] = $value;
-            $updateQuery .= " WHERE $key = :$key";
-        }
-        else {
-            $saveData["id"] = $id;
-            $updateQuery .= " WHERE id = :id";
-        }
-
+        $updateQuery .= $this->getWhereCondition($id, $saveData);
         $this->exec($updateQuery, $saveData);
     }
 
     public function delete($table, $id) {
-        $updateQuery = "DELETE FROM " . $this->escapeIdent($table);
         $params = [];
-
-        if (is_array($id)) {
-            $key = $this->escapeIdent(key($id));
-            $value = current($id);
-
-            $params[$key] = $value;
-            $updateQuery .= " WHERE $key = :$key";
-        }
-        else {
-            $params["id"] = $id;
-            $updateQuery .= " WHERE id = :id";
-        }
-
+        $updateQuery = "DELETE FROM " . $this->escapeIdent($table) . $this->getWhereCondition($id, $params);
         $this->exec($updateQuery, $params);
     }
 
@@ -199,6 +182,62 @@ class Database
         $insertAction = $ignore ? "INSERT IGNORE INTO" : "INSERT INTO";
         $insertQuery = $insertAction . " " . $this->escapeIdent($table) . "(" . $keys . ") VALUES(" . $values . ")";
         $this->exec($insertQuery, $saveData);
+    }
+
+    public function read($table, $id, $columns = []) {
+        $columnsQuery = "*";
+        $valueReturn = false;
+
+        if (is_array($columns) && count($columns) > 0) {
+            $columnsQuery = join(",", $this->escapeIdent($columns));
+        }
+
+        if (is_string($columns)) {
+            $columnsQuery = $this->escapeIdent($columns);
+            $valueReturn = true;
+        }
+
+        $params = [];
+        $selectQuery = "SELECT " . $columnsQuery . " FROM " . $this->escapeIdent($table) . $this->getWhereCondition($id, $params);
+
+        if ($valueReturn)
+            return $this->fetchColumn($selectQuery, $params);
+
+        return $this->fetch($selectQuery, $params);
+    }
+
+    public function insertUpdate($table, $id, $columns) {
+        if (is_string($id))
+            $id = ["id" => $id];
+
+        $exists = $this->read($table, $id, key($id));
+        if ($exists) {
+            $this->update($table, $id, $columns);
+        }
+        else {
+            $this->insert($table, array_merge($id, $columns));
+        }
+    }
+
+    protected function getWhereCondition($id, &$params) {
+        $whereQuery = " WHERE ";
+
+        if (is_array($id)) {
+            $join = [];
+            foreach ($id as $k => $v) {
+                $key = $this->escapeIdent($k);
+                $join[] = "$key = :$key";
+                $params[$key] = $v;
+            }
+
+            $whereQuery .= join(" AND ", $join);
+        }
+        else {
+            $params["id"] = $id;
+            $whereQuery .= "id = :id";
+        }
+
+        return $whereQuery;
     }
 
     public function escapeIdent($column) {
@@ -211,6 +250,8 @@ class Database
 
     public function getTablesStructure() {
         $database = $this->fetchColumn('SELECT DATABASE()');
+
+        // TODO add BINARY column definition
 
         $columns = $this->fetchAll("SELECT
             table_name, column_name, is_nullable, character_set_name, collation_name, column_type, column_key, extra
@@ -298,9 +339,9 @@ class DatabaseDebug extends Database
         return $result;
     }
 
-    public function fetchSingle($sql, $params = null, $column = null) {
-        $instance = $this->setUpLog("fetchSingle", $sql, $params);
-        $result = parent::fetchSingle($sql, $params, $column);
+    public function fetchColumn($sql, $params = null) {
+        $instance = $this->setUpLog("fetchColumn", $sql, $params);
+        $result = parent::fetchColumn($sql, $params);
         $this->tearDownLog($instance);
 
         return $result;
