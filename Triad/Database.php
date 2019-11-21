@@ -24,17 +24,22 @@ class Database
     protected $user;
     protected $password;
     protected $persistent;
+    protected $options;
 
-    public function __construct($dns, $user, $password, $persistent = false) {
+    public function __construct($dns, $user, $password, $persistent = false, $options = array()) {
         $this->dns = $dns;
         $this->user = $user;
         $this->password = $password;
         $this->persistent = $persistent;
+        $this->options = $options;
     }
 
     public function connect() {
         if (is_null($this->db)) {
-            $this->db = new PDO($this->dns, $this->user, $this->password, array(PDO::ATTR_PERSISTENT => $this->persistent));
+            $options = $this->options;
+            $options[PDO::ATTR_PERSISTENT] = $this->persistent;
+
+            $this->db = new PDO($this->dns, $this->user, $this->password, $options);
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             //  paranoid, huh, we will not need these anymore
