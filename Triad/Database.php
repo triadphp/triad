@@ -171,13 +171,13 @@ class Database
             $first = false;
         }
 
-        $updateQuery .= $this->getWhereCondition($id, $saveData);
+        $updateQuery .= $this->getWhereCondition($table, $id, $saveData);
         $this->exec($updateQuery, $saveData);
     }
 
     public function delete($table, $id) {
         $params = [];
-        $updateQuery = "DELETE FROM " . $this->escapeIdent($table) . $this->getWhereCondition($id, $params);
+        $updateQuery = "DELETE FROM " . $this->escapeIdent($table) . $this->getWhereCondition($table, $id, $params);
         $this->exec($updateQuery, $params);
     }
 
@@ -203,7 +203,7 @@ class Database
         }
 
         $params = [];
-        $selectQuery = "SELECT " . $columnsQuery . " FROM " . $this->escapeIdent($table) . $this->getWhereCondition($id, $params);
+        $selectQuery = "SELECT " . $columnsQuery . " FROM " . $this->escapeIdent($table) . $this->getWhereCondition($table, $id, $params);
 
         if ($valueReturn)
             return $this->fetchColumn($selectQuery, $params);
@@ -224,14 +224,14 @@ class Database
         }
     }
 
-    protected function getWhereCondition($id, &$params) {
+    protected function getWhereCondition($table, $id, &$params) {
         $whereQuery = " WHERE ";
 
         if (is_array($id)) {
             $join = [];
             foreach ($id as $k => $v) {
                 $key = $this->escapeIdent($k);
-                $join[] = "$key = :$key";
+                $join[] = $this->escapeIdent($table) . ".$key = :$key";
                 $params[$key] = $v;
             }
 
@@ -239,7 +239,7 @@ class Database
         }
         else {
             $params["id"] = $id;
-            $whereQuery .= "id = :id";
+            $whereQuery .= $this->escapeIdent($table) . ".id = :id";
         }
 
         return $whereQuery;
@@ -275,6 +275,9 @@ class Database
 
         $tables = [];
         foreach ($columns as $column) {
+            if (empty($column["column_name"]))
+                continue;
+
             $data = [
                 "name" => $column["column_name"],
                 "nullable" => $column["is_nullable"] == "YES",
@@ -287,11 +290,17 @@ class Database
         }
 
         foreach ($indexes as $index) {
+            if (empty($index["column_name"]))
+                continue;
+
             $tables[$index["table_name"]]["indexes"][$index["index_name"]]["unique"] = !$index["non_unique"];
             $tables[$index["table_name"]]["indexes"][$index["index_name"]]["columns"][] = $index["column_name"];
         }
 
         foreach ($schemas as $schema) {
+            if (empty($schema["table_name"]))
+                continue;
+
             $tables[$schema["table_name"]]["engine"] = $schema["engine"];
             $tables[$schema["table_name"]]["table_collation"] = $schema["table_collation"];
         }
