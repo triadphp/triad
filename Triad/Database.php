@@ -167,7 +167,7 @@ class Database
 
         $first = true;
         foreach ($saveData as $key => $value) {
-            $updateQuery .= ($first ? "" : ",") . " ".$this->escapeIdent($key)." = :".$this->escapeIdent($key)."";
+            $updateQuery .= ($first ? "" : ",") . " ".$this->prefixIdent($key, $table)." = :".$this->escapeIdent($key)."";
             $first = false;
         }
 
@@ -182,7 +182,7 @@ class Database
     }
 
     public function insert($table, $saveData, $ignore = false) {
-        $keys = join(",", $this->escapeIdent(array_keys($saveData)));
+        $keys = join(",", $this->prefixIdent(array_keys($saveData), $table));
         $values = ":".join(", :", $this->escapeIdent(array_keys($saveData)));
         $insertAction = $ignore ? "INSERT IGNORE INTO" : "INSERT INTO";
         $insertQuery = $insertAction . " " . $this->escapeIdent($table) . "(" . $keys . ") VALUES(" . $values . ")";
@@ -194,11 +194,11 @@ class Database
         $valueReturn = false;
 
         if (is_array($columns) && count($columns) > 0) {
-            $columnsQuery = join(",", $this->escapeIdent($columns));
+            $columnsQuery = join(",", $this->prefixIdent($columns, $table));
         }
 
         if (is_string($columns)) {
-            $columnsQuery = $this->escapeIdent($columns);
+            $columnsQuery = $this->prefixIdent($columns, $table);
             $valueReturn = true;
         }
 
@@ -231,7 +231,7 @@ class Database
             $join = [];
             foreach ($id as $k => $v) {
                 $key = $this->escapeIdent($k);
-                $join[] = $this->escapeIdent($table) . ".$key = :$key";
+                $join[] = $this->prefixIdent($key, $table) . " = :$key";
                 $params[$key] = $v;
             }
 
@@ -239,7 +239,7 @@ class Database
         }
         else {
             $params["id"] = $id;
-            $whereQuery .= $this->escapeIdent($table) . ".id = :id";
+            $whereQuery .= $this->prefixIdent("id", $table) . " = :id";
         }
 
         return $whereQuery;
@@ -251,6 +251,18 @@ class Database
 
         $column = preg_replace('/[^A-Za-z0-9_-]+/', '', $column);
         return $column;
+    }
+
+    public function prefixIdent($column, $table) {
+        if (is_array($column)) {
+            $list = [];
+            foreach ($column as $c) {
+                $list[] = $this->escapeIdent($table) . "." . $this->escapeIdent($c);
+            }
+            return $list;
+        }
+
+        return $this->escapeIdent($table) . "." . $this->escapeIdent($column);
     }
 
     public function getTablesStructure() {
