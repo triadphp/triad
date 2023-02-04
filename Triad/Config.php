@@ -53,25 +53,30 @@ class Config implements \ArrayAccess
         if (isset($this->container[$name])) {
             return $this->container[$name];
         }
-        return null;
+        $null = null;
+        return $null;
     }
 
     function __set($name, $value) {
         throw new TriadException("Config is read only");
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return isset($this->container[$offset]);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->container[$offset];
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         throw new TriadException("Config is read only");
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         throw new TriadException("Config is read only");
     }

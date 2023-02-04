@@ -34,22 +34,26 @@ class Session implements \ArrayAccess
         $this->duration = $duration;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return isset($_COOKIE[$this->prefix . $offset]);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $_COOKIE[$this->prefix . $offset];
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $_COOKIE[$this->prefix . $offset] = $value;
         $this->setSecureCookie($this->prefix . $offset, $value, $this->duration);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         $this->setSecureCookie($this->prefix . $offset, "", -$this->duration);

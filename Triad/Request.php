@@ -30,7 +30,7 @@ final class RequestMethod
  * \Triad\Request::factory("/request_path", array("params" => 1))->execute($application)->response->get()
  * @package Triad
  */
-class Request implements \Serializable
+class Request
 {
     public $path = "/";
     public $method = RequestMethod::READ;
@@ -215,7 +215,11 @@ class Request implements \Serializable
         return $this;
     }
 
-    public function serialize()
+    public function serialize() {
+        return $this->__serialize();
+    }
+
+    public function __serialize()
     {
         $data = array(
             "path" => $this->path,
@@ -226,7 +230,11 @@ class Request implements \Serializable
         return json_encode($data);
     }
 
-    public function unserialize($serialized)
+    public function unserialize($serialized) {
+        $this->__unserialize($serialized);
+    }
+
+    public function __unserialize($serialized)
     {
         $data = json_decode($serialized, true);
 
